@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+    id 'scala'
+}
+
+group 'com-demo'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/io.gatling.highcharts/gatling-charts-highcharts
+    testImplementation group: 'io.gatling.highcharts', name: 'gatling-charts-highcharts', version: '3.8.0'
+
+    // https://mvnrepository.com/artifact/org.json/json
+    implementation group: 'org.json', name: 'json', version: '20090211'
+}
+
+task testLoad(type: JavaExec) {
+    description = 'Test load with Gatling'
+    group = 'Load Test'
+    classpath = sourceSets.test.runtimeClasspath
+    jvmArgs = [
+            "-Dlogback.configurationFile=${logbackGatlingConfig()}",
+            "-XX:+IgnoreUnrecognizedVMOptions"
+    ]
+    main = 'io.gatling.app.Gatling'
+    args = [
+//            '--simulation', 'simulation.I9MobileOrchSimulation',
+            '--simulation', 'simulation.RTWMobileOrchSimulation',
+            '--results-folder', "${buildDir}/gatling-results"
+    ]
+}
+
+def logbackGatlingConfig() {
+    return sourceSets.test.resources.find { it.name == 'logback-gatling.xml' };
+}
